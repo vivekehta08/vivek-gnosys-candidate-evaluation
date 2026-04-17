@@ -39,10 +39,12 @@
     document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('candidate-form');
         const status = document.getElementById('ajax-status');
+        const saveButton = form.querySelector('button');
 
         form.addEventListener('submit', async function (event) {
             event.preventDefault();
             status.innerHTML = '';
+            saveButton.disabled = true;
 
             const formData = new FormData(form);
             try {
@@ -63,6 +65,7 @@
 
                 form.reset();
                 status.innerHTML = `<div class="alert alert-success">${json.message}</div>`;
+                saveButton.disabled = false;
             } catch (error) {
                 let html = '<div class="alert alert-danger"><ul class="mb-0">';
                 if (error.errors) {
@@ -78,6 +81,7 @@
                 }
                 html += '</ul></div>';
                 status.innerHTML = html;
+                saveButton.disabled = false;
             }
         });
     });

@@ -98,6 +98,8 @@
             form.addEventListener('submit', async function (event) {
                 event.preventDefault();
                 status.innerHTML = '';
+                const button = form.querySelector('button');
+                button.disabled = true;
                 const formData = new FormData(form);
 
                 try {
@@ -123,6 +125,7 @@
                         screeningStatus.textContent = json.candidate.screening?.status ?? 'Pending';
                         renderEvaluations(json.candidate.evaluations || []);
                     }
+                    button.disabled = false;
                 } catch (error) {
                     let html = '<div class="alert alert-danger"><ul class="mb-0">';
                     if (error.errors) {
@@ -138,6 +141,7 @@
                     }
                     html += '</ul></div>';
                     status.innerHTML = html;
+                    button.disabled = false;
                 }
             });
         });

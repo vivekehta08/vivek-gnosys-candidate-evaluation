@@ -4,7 +4,9 @@
 
 <h3>Edit Candidate</h3>
 
-<form method="POST" action="{{ route('admin.candidates.update', $candidate->id) }}" enctype="multipart/form-data">
+<div id="ajax-status"></div>
+
+<form id="candidate-form" method="POST" action="{{ route('admin.candidates.update', $candidate->id) }}" enctype="multipart/form-data">
     @csrf
     @method('PUT')
 
@@ -35,3 +37,56 @@
 </form>
 
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('candidate-form');
+        const status = document.getElementById('ajax-status');
+        const saveButton = form.querySelector('button');
+
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            status.innerHTML = '';
+            saveButton.disabled = true;
+
+            const formData = new FormData(form);
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: formData
+                });
+
+                const json = await response.json();
+
+                if (!response.ok) {
+                    throw json;
+                }
+
+                status.innerHTML = `<div class="alert alert-success">${json.message}</div>`;
+                saveButton.disabled = false;
+            } catch (error) {
+                let html = '<div class="alert alert-danger"><ul class="mb-0">';
+                if (error.errors) {
+                    Object.values(error.errors).forEach(errList => {
+                        errList.forEach(err => {
+                            html += `<li>${err}</li>`;
+                        });
+                    });
+                } else if (error.message) {
+                    html += `<li>${error.message}</li>`;
+                } else {
+                    html += '<li>Unable to update candidate.</li>';
+                }
+                html += '</ul></div>';
+                status.innerHTML = html;
+                saveButton.disabled = false;
+            }
+        });
+    });
+</script>
+@endpush

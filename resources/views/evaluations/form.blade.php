@@ -1,4 +1,4 @@
-<form method="POST" action="{{ $action }}" class="card p-3 mb-3">
+<form method="POST" action="{{ $action }}" class="card p-3 mb-3 ajax-form">
     @csrf
 
     <input type="hidden" name="candidate_id" value="{{ $candidate->id }}">
